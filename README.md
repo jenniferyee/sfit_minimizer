@@ -24,3 +24,7 @@ Please see the "examples" folder.
 ## How to install?
 
 Clone this repository.
+
+## License
+
+[BSD 3-Clause](LICENSE)
