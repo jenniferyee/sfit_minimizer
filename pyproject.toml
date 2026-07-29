@@ -1,0 +1,33 @@
+[project]
+name = "sfit_minimizer"
+description = "A. Gould's sfit gradient-type minimization algorithm"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dynamic = ["version"]
+dependencies = [
+  "numpy",
+  "matplotlib",
+]
+
+[project.optional-dependencies]
+# The core minimizer does not need MulensModel; only the microlensing layer
+# (sfit_minimizer.mm_funcs) operates on MulensModel Event objects.
+mulens = ["MulensModel"]
+test = ["pytest", "MulensModel"]
+
+[build-system]
+# >=77 for PEP 639 SPDX `license` / `license-files` support.
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = { attr = "sfit_minimizer.version.__version__" }
+
+[tool.setuptools]
+package-dir = { "" = "source" }
+
+[tool.setuptools.packages.find]
+where = ["source"]
+include = ["sfit_minimizer*"]

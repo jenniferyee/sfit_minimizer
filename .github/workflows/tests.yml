@@ -1,0 +1,33 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The whole suite runs in ~7 s, so every supported interpreter gets a
+        # full run rather than splitting fast/slow sessions.
+        python-version: ["3.11", "3.12", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # uv installs the project itself in editable mode, which sfit_minimizer.DATA_PATH
+      # relies on to locate the repo's data/ directory.
+      - name: Run tests
+        run: >
+          uv run --extra test
+          pytest -v source/sfit_minimizer/test
