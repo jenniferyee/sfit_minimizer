@@ -10,7 +10,7 @@ described by a tangent plane.  </dl>
 [**Detailed documentation: https://jenniferyee.github.io/sfit_minimizer/**](
 https://jenniferyee.github.io/sfit_minimizer/)
 
-[Latest release: 1.0.2](https://github.com/jenniferyee/sfit_minimizer/releases/latest)
+[Latest release: 1.0.3](https://github.com/jenniferyee/sfit_minimizer/releases/latest)
 
 ## Acknowledgements
 
