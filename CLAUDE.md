@@ -75,6 +75,24 @@ The job relies on `uv` installing the project **editable**, because `DATA_PATH` 
 module file to find `<repo>/data`. A non-editable install would resolve `DATA_PATH` into
 site-packages and every data-loading test would fail.
 
+### No lockfile — deliberate
+
+`uv.lock` is gitignored, so every CI run resolves `numpy` / `matplotlib` / `MulensModel` fresh from
+the bare (unbounded) requirements in `pyproject.toml`. That is the point: a lockfile pins what the
+maintainer builds, never what a user gets, since locks are not part of published sdist/wheel
+metadata — `pip install sfit_minimizer` always resolves the ranges. Running unlocked means ordinary
+CI *is* the check that those ranges still work against current upstream.
+
+The cost is that an upstream release can turn CI red on an unrelated PR. The sibling repos split on
+exactly this line: EXOZIPPy tracks `poetry.lock` for its pymc/pytensor/jax stack and then needs a
+second, *unlocked* nightly job to cover the blind spot the lock creates; MMEXOFAST, like this repo,
+gitignores its lock. With three well-behaved dependencies and a 7-second suite, staying unlocked is
+the better trade here. **Adding a lock means also adding that unlocked job**, or the range-checking
+coverage is silently lost.
+
+A consequence: Dependabot has no `pip` entry in `.github/dependabot.yml`, because with neither a
+lock nor upper bounds there is nothing for it to raise.
+
 `tests.yml` also exposes `workflow_call`, which `publish.yml` uses to gate releases on the same
 suite rather than a copy of it. Adding a job there that needs write permissions means granting it
 explicitly at the `uses:` call site in `publish.yml`, or the whole release workflow fails at

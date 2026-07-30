@@ -1,0 +1,28 @@
+# Dependabot opens PRs for out-of-date dependencies.
+version: 2
+
+updates:
+  # GitHub Actions. This repo pins five of them across tests.yml and
+  # publish.yml (checkout, setup-uv, upload-artifact, download-artifact,
+  # gh-action-pypi-publish), and pinned actions rot silently: the usual symptom
+  # is the runner deprecating a Node runtime and every run emitting warnings
+  # until someone bumps them by hand. Dependabot opens that PR unprompted.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      # One PR for all action bumps rather than five. Actions move together and
+      # are near-always safe.
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "CI"
+
+  # NOTE: there is deliberately no "pip" ecosystem entry here, unlike EXOZIPPy.
+  # Dependabot updates a lockfile or a constrained manifest, and this project
+  # has neither -- pyproject declares bare `numpy`, `matplotlib`, `MulensModel`
+  # with no upper bounds, so there is nothing for it to raise. CI resolves those
+  # fresh on every run instead, which is what actually catches an incompatible
+  # upstream release. Adding a lockfile would change that trade-off; see the
+  # note in CLAUDE.md before doing so.

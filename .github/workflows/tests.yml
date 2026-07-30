@@ -15,9 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The whole suite runs in ~7 s, so every supported interpreter gets a
-        # full run rather than splitting fast/slow sessions.
-        python-version: ["3.11", "3.12", "3.14"]
+        # Every interpreter `requires-python = ">=3.11"` claims, with no
+        # fast/slow session split: the whole suite runs in ~7 s and matrix
+        # combinations run concurrently, so breadth here is effectively free.
+        # Keep this in sync with requires-python -- a version claimed there and
+        # missing here is an untested claim.
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v7
