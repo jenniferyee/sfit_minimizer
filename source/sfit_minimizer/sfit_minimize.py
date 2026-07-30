@@ -23,30 +23,31 @@ def set_initial_step_size(options):
             iteration of the :py:func:`~minimize` routine.
     """
     default = 0.1
-    if (options is None) or not ('step' in options.keys()):
-        options = {'step': default}
+    if (options is None) or not ("step" in options.keys()):
+        options = {"step": default}
 
-    if isinstance(options['step'], (str)):
-        if options['step'].lower() == 'adaptive':
+    if isinstance(options["step"], (str)):
+        if options["step"].lower() == "adaptive":
             fac = 0.01
         else:
             raise ValueError(
-                'Invalid option for "step": {0}'.format(options['step']))
-    elif options['step'] is None:
+                'Invalid option for "step": {0}'.format(options["step"])
+            )
+    elif options["step"] is None:
         fac = default
-    elif np.isfinite(options['step']):
-        fac = options['step']
+    elif np.isfinite(options["step"]):
+        fac = options["step"]
     else:
         raise ValueError(
-            'Invalid option for "step": {0}'.format(options['step']))
+            'Invalid option for "step": {0}'.format(options["step"])
+        )
 
     return (fac, options)
 
 
 def minimize(
-        sfit_obj, x0=None, tol=1e-3, options=None, max_iter=1000,
-        verbose=False):
-
+    sfit_obj, x0=None, tol=1e-3, options=None, max_iter=1000, verbose=False
+):
     """
     Find the best-fit parameters for a function f using A. Gould's sfit
     algorithm.
@@ -83,11 +84,22 @@ def minimize(
     old_chi2 = sfit_obj.chi2
     x_old = x0
     if verbose:
-        print('{6} {0:>16} {1:>16} {2} {3}\n{4}\n{5}\n'.format(
-                'old_chi2', 'new_chi2', '[step]', 'stepfrac', '[old params]',
-                '[new params]', 'i'))
-        print('{6} {0:16.4f} {1:16.4f} {2} {3}\n{4}\n{5}\n'.format(
-                old_chi2, sfit_obj.chi2, sfit_obj.step, fac, x_old, None, -1))
+        print(
+            "{6} {0:>16} {1:>16} {2} {3}\n{4}\n{5}\n".format(
+                "old_chi2",
+                "new_chi2",
+                "[step]",
+                "stepfrac",
+                "[old params]",
+                "[new params]",
+                "i",
+            )
+        )
+        print(
+            "{6} {0:16.4f} {1:16.4f} {2} {3}\n{4}\n{5}\n".format(
+                old_chi2, sfit_obj.chi2, sfit_obj.step, fac, x_old, None, -1
+            )
+        )
         start = time.time()
 
     for i in range(max_iter):
@@ -96,26 +108,34 @@ def minimize(
         sfit_obj.update_all(x_new)
 
         if verbose:
-            print('{6} {0:16.4f} {1:16.4f} {2} {3}\n{4}\n{5}\n'.format(
-                old_chi2, sfit_obj.chi2, sfit_obj.step, fac, x_old, x_new, i))
+            print(
+                "{6} {0:16.4f} {1:16.4f} {2} {3}\n{4}\n{5}\n".format(
+                    old_chi2,
+                    sfit_obj.chi2,
+                    sfit_obj.step,
+                    fac,
+                    x_old,
+                    x_new,
+                    i,
+                )
+            )
             stop = time.time()
-            print('step runtime (s): ', stop - start)
+            print("step runtime (s): ", stop - start)
             start = time.time()
 
-        if options['step'] == 'adaptive':
+        if options["step"] == "adaptive":
             if old_chi2 - sfit_obj.chi2 < 1.0:
                 fac = 0.1
 
         if old_chi2 < sfit_obj.chi2:
-            msg = 'New chi2 worse than old chi2.\n'
-            msg += 'Previous step: {0}, {1}\n'.format(old_chi2, x_old)
-            msg += 'New step: {0}, {1}\n'.format(sfit_obj.chi2, x_new)
+            msg = "New chi2 worse than old chi2.\n"
+            msg += "Previous step: {0}, {1}\n".format(old_chi2, x_old)
+            msg += "New step: {0}, {1}\n".format(sfit_obj.chi2, x_new)
             sfit_obj.update_all(x_old)
-            return SFitResults(
-                sfit_obj, success=False, msg=msg, iterations=i)
+            return SFitResults(sfit_obj, success=False, msg=msg, iterations=i)
         elif old_chi2 - sfit_obj.chi2 < tol:
             if verbose:
-                print('tolerance reached!')
+                print("tolerance reached!")
 
             break
         else:
@@ -125,8 +145,13 @@ def minimize(
     sfit_obj.update_all(x_new)
     if i < max_iter - 1:
         return SFitResults(
-            sfit_obj, success=True, iterations=i, fun=sfit_obj.chi2)
+            sfit_obj, success=True, iterations=i, fun=sfit_obj.chi2
+        )
     else:
         return SFitResults(
-            sfit_obj, success=False, fun=old_chi2,
-            msg='max iterations exceeded: {0}'.format(max_iter), iterations=i)
+            sfit_obj,
+            success=False,
+            fun=old_chi2,
+            msg="max iterations exceeded: {0}".format(max_iter),
+            iterations=i,
+        )

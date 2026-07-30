@@ -20,8 +20,13 @@ def _set_initial_guess(event, parameters_to_fit):
 
 
 def fit_mulens_event(
-        event, parameters_to_fit=None, initial_guess=None, plot=False,
-        tol=1e-5, verbose=False):
+    event,
+    parameters_to_fit=None,
+    initial_guess=None,
+    plot=False,
+    tol=1e-5,
+    verbose=False,
+):
     """
     Basic function for fitting a point-lens microlensing model to data.
 
@@ -63,33 +68,38 @@ def fit_mulens_event(
         initial_guess = _set_initial_guess(event, parameters_to_fit)
 
     my_func = sfit_minimizer.mm_funcs.PointLensSFitFunction(
-        event, parameters_to_fit)
+        event, parameters_to_fit
+    )
 
     if verbose:
         print(event)
-        print('fixed fs', event.fix_source_flux)
-        print('fixed fb', event.fix_blend_flux)
-        print('Initial guess', initial_guess)
+        print("fixed fs", event.fix_source_flux)
+        print("fixed fb", event.fix_blend_flux)
+        print("Initial guess", initial_guess)
 
     # Do the fit
     result = sfit_minimizer.minimize(
-        my_func, x0=initial_guess, tol=tol,
-        options={'step': 'adaptive'}, verbose=verbose)
+        my_func,
+        x0=initial_guess,
+        tol=tol,
+        options={"step": "adaptive"},
+        verbose=verbose,
+    )
 
     values = result.x
     sigmas = result.sigmas
     if verbose:
         # Print the results
-        print('Full Results:')
+        print("Full Results:")
         print(result)
-        print('results: ')
+        print("results: ")
         print(values)
-        print('+/-')
+        print("+/-")
         print(sigmas)
 
     my_func.update_all(values)
     if verbose:
-        print('chi2: ', my_func.chi2)
+        print("chi2: ", my_func.chi2)
 
     if plot:
         if my_func.event.model.parameters.t_0 > 2000000:
@@ -145,8 +155,12 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
     """
 
     def __init__(
-            self, event, parameters_to_fit, estimate_fluxes=False,
-            add_2450000=False):
+        self,
+        event,
+        parameters_to_fit,
+        estimate_fluxes=False,
+        add_2450000=False,
+    ):
         self.event = event
         self.parameters_to_fit = parameters_to_fit
 
@@ -217,20 +231,23 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
             self.event.fit_fluxes()
             for dataset in self.event.datasets:
                 (source_flux, blend_flux) = self.event.get_flux_for_dataset(
-                    dataset)
+                    dataset
+                )
                 fix_source_flux[dataset] = source_flux
                 fix_blend_flux[dataset] = blend_flux
         else:
             for dataset in self.event.datasets:
                 if dataset in self.event.fix_source_flux.keys():
                     fix_source_flux[dataset] = self.event.fix_source_flux[
-                        dataset]
+                        dataset
+                    ]
                 else:
                     fix_source_flux[dataset] = 1.0
 
                 if dataset in self.event.fix_blend_flux.keys():
                     fix_blend_flux[dataset] = self.event.fix_blend_flux[
-                        dataset]
+                        dataset
+                    ]
                 else:
                     fix_blend_flux[dataset] = 0.0
 
@@ -238,14 +255,17 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
         self.event.fix_blend_flux = fix_blend_flux
 
     def _flatten_data(self):
-        """ Concatenate good points for all datasets into a single array with
+        """Concatenate good points for all datasets into a single array with
         columns: Date, flux, err.
         """
         self.data_len = []
         flattened_data = []
         for i, dataset in enumerate(self.event.datasets):
-            data = [dataset.time[dataset.good], dataset.flux[dataset.good],
-                    dataset.err_flux[dataset.good]]
+            data = [
+                dataset.time[dataset.good],
+                dataset.flux[dataset.good],
+                dataset.err_flux[dataset.good],
+            ]
             self.data_len.append(np.sum(dataset.good))
             if i == 0:
                 flattened_data = np.array(data)
@@ -257,10 +277,11 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
     def _update_ulens_params(self, theta):
         self._theta = theta
 
-        for (key, val) in enumerate(self.parameters_to_fit):
-            if (val == 't_0') and self.add_2450000:
+        for key, val in enumerate(self.parameters_to_fit):
+            if (val == "t_0") and self.add_2450000:
                 setattr(
-                    self.event.model.parameters, val, theta[key] + 2450000.)
+                    self.event.model.parameters, val, theta[key] + 2450000.0
+                )
             else:
                 setattr(self.event.model.parameters, val, theta[key])
 
@@ -278,14 +299,14 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
         See :py:func:`sfit_minimizer.sfit_classes.SFitFunction.update_all()`.
         """
         if theta is None:
-            raise ValueError('theta must be passed to update_all()')
+            raise ValueError("theta must be passed to update_all()")
 
         self._update_ulens_params(theta)
 
         if verbose:
-            print('new value:', theta)
-            print('fluxes:', self.event.fluxes)
-            print('model:', self.event.model)
+            print("new value:", theta)
+            print("fluxes:", self.event.fluxes)
+            print("model:", self.event.model)
 
         sfit_minimizer.SFitFunction.update_all(self, theta, verbose=verbose)
 
@@ -293,12 +314,11 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
         """Calculate expected values of the residuals"""
         res = []
         for i, fit in enumerate(self.event.fits):
-            res_dataset = fit.get_residuals(phot_fmt='flux', bad=False)
+            res_dataset = fit.get_residuals(phot_fmt="flux", bad=False)
             if i == 0:
                 res = np.array(res_dataset[0][fit.dataset.good])
             else:
-                res = np.hstack(
-                    (res, res_dataset[0][fit.dataset.good]))
+                res = np.hstack((res, res_dataset[0][fit.dataset.good]))
 
         self.residuals = res
 
@@ -321,7 +341,8 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
 
             # Derivatives of ulens params
             dA_dparm = fit.get_d_A_d_params_for_point_lens_model(
-                   self.parameters_to_fit)
+                self.parameters_to_fit
+            )
             if len(self.parameters_to_fit) > 0:
                 for j, key in enumerate(self.parameters_to_fit):
                     x = fit.source_flux * dA_dparm[key]
@@ -330,7 +351,8 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
             # Derivatives of flux parameters
             if self.fs_indices[i] is not None:
                 dfunc_df_source = np.array(
-                    [fit.data_magnification[fit.dataset.good]])
+                    [fit.data_magnification[fit.dataset.good]]
+                )
                 dfunc[self.fs_indices[i], ind_start:ind_stop] = dfunc_df_source
 
             if self.fb_indices[i] is not None:

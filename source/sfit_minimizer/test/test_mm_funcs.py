@@ -1,6 +1,7 @@
 """
 Tests for the MulensModel functions = direct comparisons to Andy's fortran sfit.
 """
+
 import copy
 import os.path
 import unittest
@@ -20,17 +21,16 @@ import sfit_minimizer
 """
 
 
-mm.utils.MAG_ZEROPOINT = 18.
-data_path = os.path.join(sfit_minimizer.DATA_PATH, 'MMTest')
-SAMPLE_FILE_01 = os.path.join(data_path, 'PSPL_1_Obs_1.pho')
-SAMPLE_FILE_02 = os.path.join(data_path, 'PSPL_1_Obs_2.pho')
+mm.utils.MAG_ZEROPOINT = 18.0
+data_path = os.path.join(sfit_minimizer.DATA_PATH, "MMTest")
+SAMPLE_FILE_01 = os.path.join(data_path, "PSPL_1_Obs_1.pho")
+SAMPLE_FILE_02 = os.path.join(data_path, "PSPL_1_Obs_2.pho")
 
 
 def get_pspl_datafiles():
     datasets = []
     for filename in [SAMPLE_FILE_01, SAMPLE_FILE_02]:
-        data = mm.MulensData(
-            file_name=filename, phot_fmt='mag')
+        data = mm.MulensData(file_name=filename, phot_fmt="mag")
         datasets.append(data)
 
     return datasets
@@ -42,11 +42,11 @@ class FortranSFitFile(object):
     """
 
     def __init__(self, filename):
-        input_file = open(filename, 'r')
+        input_file = open(filename, "r")
         attr = None
         for line in input_file.readlines():
             str_vec = line.strip().split()
-            if str_vec[0] == '#':
+            if str_vec[0] == "#":
                 attr = str_vec[-1]
             else:
                 if len(str_vec) == 1:
@@ -60,26 +60,38 @@ class FortranSFitFile(object):
 
 
 class ComparisonTest(object):
-
-    def __init__(self, datafiles=None, comp_dir=None, parameters_to_fit=None,
-                 coords=None, n_t_star=None, verbose=False, fix_blend_flux=None,
-                 fix_source_flux=None):
+    def __init__(
+        self,
+        datafiles=None,
+        comp_dir=None,
+        parameters_to_fit=None,
+        coords=None,
+        n_t_star=None,
+        verbose=False,
+        fix_blend_flux=None,
+        fix_source_flux=None,
+    ):
 
         # Get step size from directory name
-        str_vec = comp_dir.split('_')
+        str_vec = comp_dir.split("_")
         self.fac = float(str_vec[2])
 
         # Read in SFit results
         self.sfit_results = FortranSFitFile(
-            os.path.join(data_path, 'Matrices', comp_dir, 'fort.60'))
+            os.path.join(data_path, "Matrices", comp_dir, "fort.60")
+        )
         self.matrices = []
         for i in range(3):
             self.matrices.append(
                 FortranSFitFile(
                     os.path.join(
-                        data_path, 'Matrices', comp_dir,
-                        'fort.{0}'.format(50 + i + 1))
-                ))
+                        data_path,
+                        "Matrices",
+                        comp_dir,
+                        "fort.{0}".format(50 + i + 1),
+                    )
+                )
+            )
 
         # parameters_to_fit
         self.parameters_to_fit = parameters_to_fit
@@ -90,22 +102,26 @@ class ComparisonTest(object):
 
         self.datasets = []
         for i, filename in enumerate(datafiles):
-            if filename[0:2] == 'FS':
-                filestr = filename.split('.')
+            if filename[0:2] == "FS":
+                filestr = filename.split(".")
                 bandpass = filestr[0][-1]
             else:
                 bandpass = None
 
             data = mm.MulensData(
-                file_name=os.path.join(data_path, filename), phot_fmt='mag',
-                bandpass=bandpass)
+                file_name=os.path.join(data_path, filename),
+                phot_fmt="mag",
+                bandpass=bandpass,
+            )
             self.datasets.append(data)
 
             if (9 + i * 3) >= len(self.matrices[0].a):
                 flux_guess = [1.0, 0.0]
             else:
-                flux_guess = [self.matrices[0].a[9 + i * 3],
-                              self.matrices[0].a[9 + i * 3 + 1]]
+                flux_guess = [
+                    self.matrices[0].a[9 + i * 3],
+                    self.matrices[0].a[9 + i * 3 + 1],
+                ]
 
             if isinstance(fix_blend_flux, list):
                 if isinstance(fix_blend_flux[i], float):
@@ -116,36 +132,48 @@ class ComparisonTest(object):
                     flux_guess.pop(0)
 
             if len(flux_guess) > 0:
-                self.initial_guess = np.hstack((self.initial_guess, flux_guess))
+                self.initial_guess = np.hstack(
+                    (self.initial_guess, flux_guess)
+                )
 
-        date_threshold = 120000.
-        if ((self.datasets[0].time[0] > date_threshold) and
-                ('t_0' in self.parameters_to_fit)):
+        date_threshold = 120000.0
+        if (self.datasets[0].time[0] > date_threshold) and (
+            "t_0" in self.parameters_to_fit
+        ):
             for i, parameter in enumerate(self.parameters_to_fit):
-                if parameter == 't_0':
+                if parameter == "t_0":
                     if self.initial_guess[i] < date_threshold:
-                        self.initial_guess[i] += 2450000.
+                        self.initial_guess[i] += 2450000.0
 
         self.n_obs = len(self.datasets)
 
         self.model = mm.Model(
-            {self.parameters_to_fit[i]: self.initial_guess[i] for i in range(
-                self.n_params)}, coords=coords)
-        if 'pi_E_N' in self.parameters_to_fit:
+            {
+                self.parameters_to_fit[i]: self.initial_guess[i]
+                for i in range(self.n_params)
+            },
+            coords=coords,
+        )
+        if "pi_E_N" in self.parameters_to_fit:
             self.model.parameters.t_0_par = self.initial_guess[0]
 
-        gammas = {'I': self.matrices[0].a[4],
-                  'V': self.matrices[0].a[5],
-                  'H': self.matrices[0].a[6]}
-        if 'rho' in self.parameters_to_fit:
+        gammas = {
+            "I": self.matrices[0].a[4],
+            "V": self.matrices[0].a[5],
+            "H": self.matrices[0].a[6],
+        }
+        if "rho" in self.parameters_to_fit:
             if n_t_star is None:
-                n_t_star = 10.
+                n_t_star = 10.0
 
             t_star = self.model.parameters.rho * self.model.parameters.t_E
-            self.model.set_magnification_methods([
-                self.model.parameters.t_0 - n_t_star * t_star,
-                'finite_source_LD_Yoo04',
-                self.model.parameters.t_0 + n_t_star * t_star])
+            self.model.set_magnification_methods(
+                [
+                    self.model.parameters.t_0 - n_t_star * t_star,
+                    "finite_source_LD_Yoo04",
+                    self.model.parameters.t_0 + n_t_star * t_star,
+                ]
+            )
             for band, value in gammas.items():
                 self.model.set_limb_coeff_gamma(band, value)
 
@@ -161,17 +189,18 @@ class ComparisonTest(object):
                     self.event.fix_source_flux[self.datasets[i]] = item
 
         self.my_func = sfit_minimizer.mm_funcs.PointLensSFitFunction(
-            self.event, self.parameters_to_fit)
+            self.event, self.parameters_to_fit
+        )
 
         self.verbose = verbose
 
         if self.verbose:
-            print('dataset, length')
+            print("dataset, length")
             for i in range(self.n_obs):
                 print(i, len(self.datasets[i].time))
 
-            print('initial guess', self.initial_guess)
-            print('initial model', self.model)
+            print("initial guess", self.initial_guess)
+            print("initial model", self.model)
 
     def run(self):
         self.test_3_iterations()
@@ -182,31 +211,35 @@ class ComparisonTest(object):
         # first 3 iterations
         new_guess = self.initial_guess
         for i in range(3):
-            print('testing iteration', i)
+            print("testing iteration", i)
             self.my_func.update_all(theta=new_guess, verbose=self.verbose)
 
             self._compare_vector(
-                new_guess, self.matrices[i].a, decimal=2, verbose=self.verbose)
+                new_guess, self.matrices[i].a, decimal=2, verbose=self.verbose
+            )
             self.compare_calcs(self.matrices[i])
             new_guess += self.my_func.step * self.fac
 
     def test_final_results(self):
         # Final results
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-4,
-            options={'step': 'adaptive'})
+            self.my_func,
+            x0=self.initial_guess,
+            tol=1e-4,
+            options={"step": "adaptive"},
+        )
 
         assert result.success
 
         if self.verbose:
-            print('mine/sfit')
-            print('chi2')
+            print("mine/sfit")
+            print("chi2")
             print(self.my_func.chi2)
             print(self.sfit_results.chi2)
-            print('a:')
+            print("a:")
             print(self.my_func.theta)
             print(self.sfit_results.a)
-            print('sigma:')
+            print("sigma:")
             print(self.my_func.get_sigmas())
             print(self.sfit_results.s)
 
@@ -224,18 +257,19 @@ class ComparisonTest(object):
             else:
                 value = value0
 
-            #assert(
+            # assert(
             #    np.abs(value - self.sfit_results.a[index]) < 0.05 * sigmas[i])
             if np.abs(sigmas[i]) > 1e-4:
                 np.testing.assert_allclose(
-                    value, self.sfit_results.a[index], atol=0.05*sigmas[i])
+                    value, self.sfit_results.a[index], atol=0.05 * sigmas[i]
+                )
             else:
                 np.testing.assert_allclose(
-                    value, self.sfit_results.a[index], atol=2e-5)
+                    value, self.sfit_results.a[index], atol=2e-5
+                )
 
         # sigmas
-        self._compare_vector(
-           sigmas, self.sfit_results.s, decimal=2)
+        self._compare_vector(sigmas, self.sfit_results.s, decimal=2)
 
     def compare_calcs(self, sfit_matrix):
         # chi2
@@ -246,40 +280,48 @@ class ComparisonTest(object):
         shape = (n_elements, n_elements)
         bmat = sfit_matrix.b.reshape(shape)
         self._compare_matrix(
-            self.my_func.bmat, bmat, decimal=2, verbose=self.verbose)
+            self.my_func.bmat, bmat, decimal=2, verbose=self.verbose
+        )
 
         # d vector
         self._compare_vector(
-            self.my_func.dvec, sfit_matrix.d, decimal=3, verbose=self.verbose)
+            self.my_func.dvec, sfit_matrix.d, decimal=3, verbose=self.verbose
+        )
 
         # c matrix
         cmat = sfit_matrix.c.reshape(shape)
         self._compare_matrix(
-            self.my_func.cmat, cmat, decimal=2, verbose=self.verbose)
+            self.my_func.cmat, cmat, decimal=2, verbose=self.verbose
+        )
 
         # step
         self._compare_vector(
-            self.my_func.step, sfit_matrix.da, decimal=3, verbose=self.verbose)
+            self.my_func.step, sfit_matrix.da, decimal=3, verbose=self.verbose
+        )
 
     def compare_chi2(self, sfit_matrix):
         if isinstance(sfit_matrix.chi2, (list, np.ndarray)):
             if len(self.datasets) != len(sfit_matrix.chi2):
                 raise ValueError(
-                    'Number of sfit chi2s != number of datasets:' +
-                    '{0}, {1}'.format(
-                        len(self.datasets), len(sfit_matrix.chi2)))
+                    "Number of sfit chi2s != number of datasets:"
+                    + "{0}, {1}".format(
+                        len(self.datasets), len(sfit_matrix.chi2)
+                    )
+                )
 
         else:
             sfit_matrix.chi2 = [sfit_matrix.chi2]
 
         for i in range(len(self.datasets)):
             dataset_chi2 = self.my_func.event.get_chi2_for_dataset(i)
-            if dataset_chi2 < 10.:
+            if dataset_chi2 < 10.0:
                 np.testing.assert_allclose(
-                    np.sum(sfit_matrix.chi2[i]), dataset_chi2, atol=0.1)
+                    np.sum(sfit_matrix.chi2[i]), dataset_chi2, atol=0.1
+                )
             else:
                 np.testing.assert_allclose(
-                    np.sum(sfit_matrix.chi2[i]), dataset_chi2, rtol=0.001)
+                    np.sum(sfit_matrix.chi2[i]), dataset_chi2, rtol=0.001
+                )
 
     def _get_index(self, i):
         """
@@ -294,20 +336,20 @@ class ComparisonTest(object):
 
         if i < self.n_params:
             # ulens parameters
-            if self.parameters_to_fit[i] == 't_0':
+            if self.parameters_to_fit[i] == "t_0":
                 index = 0
-            elif self.parameters_to_fit[i] == 'u_0':
+            elif self.parameters_to_fit[i] == "u_0":
                 index = 1
-            elif self.parameters_to_fit[i] == 't_E':
+            elif self.parameters_to_fit[i] == "t_E":
                 index = 2
-            elif self.parameters_to_fit[i] == 'rho':
+            elif self.parameters_to_fit[i] == "rho":
                 index = 3
-            elif self.parameters_to_fit[i] == 'pi_E_N':
+            elif self.parameters_to_fit[i] == "pi_E_N":
                 index = 7
-            elif self.parameters_to_fit[i] == 'pi_E_E':
+            elif self.parameters_to_fit[i] == "pi_E_E":
                 index = 8
             else:
-                raise IndexError('i > n_params')
+                raise IndexError("i > n_params")
         else:
             # flux parameters
             # i = n_params + 2. * n + 0; fs
@@ -321,7 +363,7 @@ class ComparisonTest(object):
                 if len(nob[0]) == 1:
                     index = int(9 + 3 * nob[0][0])
                 else:
-                    raise AttributeError('Multiple matches in fs_indices.')
+                    raise AttributeError("Multiple matches in fs_indices.")
 
             else:
                 # blend flux
@@ -329,19 +371,20 @@ class ComparisonTest(object):
                 if len(nob[0]) == 1:
                     index = int(9 + 3 * nob[0][0] + 1)
                 else:
-                    raise AttributeError('Multiple matches in fb_indices.')
+                    raise AttributeError("Multiple matches in fb_indices.")
 
         return index
 
     def _t0_correction(self, value):
-        if value > 12000.:
-            return value - 2450000.
+        if value > 12000.0:
+            return value - 2450000.0
         else:
             return value
 
     def _compare_vector(
-            self, my_vector, sfit_vector, decimal=5, verbose=False):
-        """ if my_vector is 0., uses an absolute tolerance of 10.^decimal.
+        self, my_vector, sfit_vector, decimal=5, verbose=False
+    ):
+        """if my_vector is 0., uses an absolute tolerance of 10.^decimal.
         Otherwise, uses a relative tolerance."""
         if verbose:
             for i, value0 in enumerate(my_vector):
@@ -349,10 +392,10 @@ class ComparisonTest(object):
                 print(i, index)
                 print(value0, sfit_vector[index], value0 / sfit_vector[index])
 
-        rtol = 10. ** (-decimal)
-        if 'rho' in self.parameters_to_fit:
+        rtol = 10.0 ** (-decimal)
+        if "rho" in self.parameters_to_fit:
             rtol = 0.05
-            
+
         for i, value0 in enumerate(my_vector):
             index = self._get_index(i)
 
@@ -361,17 +404,21 @@ class ComparisonTest(object):
             else:
                 value = value0
 
-            if np.abs(value) > 10.e-6:
+            if np.abs(value) > 10.0e-6:
                 np.testing.assert_allclose(
-                    value, sfit_vector[index], rtol=rtol)
+                    value, sfit_vector[index], rtol=rtol
+                )
             else:
                 np.testing.assert_allclose(
-                    value, sfit_vector[index], atol=10.**(-decimal))
+                    value, sfit_vector[index], atol=10.0 ** (-decimal)
+                )
 
-    def _compare_matrix(self, my_matrix, sfit_matrix, verbose=False, decimal=5):
+    def _compare_matrix(
+        self, my_matrix, sfit_matrix, verbose=False, decimal=5
+    ):
 
         if verbose:
-            print('parameters', self.parameters_to_fit)
+            print("parameters", self.parameters_to_fit)
         n_elements = my_matrix.shape[0]
         if verbose:
             for i in range(n_elements):
@@ -381,42 +428,48 @@ class ComparisonTest(object):
                     ind_j = self._get_index(j)
                     print(i, j, ind_i, ind_j)
                     print(
-                        my_matrix[i, j], sfit_matrix[ind_i, ind_j],
-                        my_matrix[i, j] / sfit_matrix[ind_i, ind_j])
+                        my_matrix[i, j],
+                        sfit_matrix[ind_i, ind_j],
+                        my_matrix[i, j] / sfit_matrix[ind_i, ind_j],
+                    )
 
         for i in range(n_elements):
             ind_i = self._get_index(i)
             for j in range(n_elements):
                 ind_j = self._get_index(j)
 
-                rtol = 10.**(-decimal)
-                if 'rho' in self.parameters_to_fit:
+                rtol = 10.0 ** (-decimal)
+                if "rho" in self.parameters_to_fit:
                     if i < len(self.parameters_to_fit):
-                        if self.parameters_to_fit[i] == 'rho':
+                        if self.parameters_to_fit[i] == "rho":
                             rtol = 0.05
 
                     if j < len(self.parameters_to_fit):
-                        if self.parameters_to_fit[j] == 'rho':
+                        if self.parameters_to_fit[j] == "rho":
                             rtol = 0.05
 
                 if np.abs(my_matrix[i, j]) > 10e-6:
                     np.testing.assert_allclose(
-                        my_matrix[i, j], sfit_matrix[ind_i, ind_j],
-                        rtol=rtol)
+                        my_matrix[i, j], sfit_matrix[ind_i, ind_j], rtol=rtol
+                    )
                 else:
                     np.testing.assert_allclose(
-                        my_matrix[i, j], sfit_matrix[ind_i, ind_j],
-                        atol=10.**(-decimal))
+                        my_matrix[i, j],
+                        sfit_matrix[ind_i, ind_j],
+                        atol=10.0 ** (-decimal),
+                    )
 
 
 def test_cmat():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
-    comparison_dir = 'PSPL_1_{0}'.format(0.1)
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
+    comparison_dir = "PSPL_1_{0}".format(0.1)
 
     test = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+    )
     test.my_func.update_all(theta=test.initial_guess)
 
     n_elements = int(np.sqrt(len(test.matrices[0].c)))
@@ -429,142 +482,175 @@ def test_cmat():
             ind_j = test._get_index(j)
             my_el = test.my_func.cmat[i, j]
             sfit_el = sfit_cmat[ind_i, ind_j]
-            if np.abs(sfit_el) > 1.:
-                np.testing.assert_almost_equal(my_el / sfit_el, 1., decimal=6)
+            if np.abs(sfit_el) > 1.0:
+                np.testing.assert_almost_equal(my_el / sfit_el, 1.0, decimal=6)
             else:
                 np.testing.assert_almost_equal(my_el, sfit_el, decimal=6)
 
 
 def test_pspl_1():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     for fac in [0.1, 0.01]:
-        comparison_dir = 'PSPL_1_{0}'.format(fac)
+        comparison_dir = "PSPL_1_{0}".format(fac)
         print(comparison_dir)
         test = ComparisonTest(
-            datafiles=datafiles, comp_dir=comparison_dir,
-            parameters_to_fit=parameters_to_fit)
+            datafiles=datafiles,
+            comp_dir=comparison_dir,
+            parameters_to_fit=parameters_to_fit,
+        )
         test.run()
 
 
 def test_pspl_2():
-    datafiles = ['PSPL_2_Obs_1.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_2_Obs_1.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     for fac in [0.1, 0.01]:
-        comparison_dir = 'PSPL_2_{0}'.format(fac)
+        comparison_dir = "PSPL_2_{0}".format(fac)
         print(comparison_dir)
         test = ComparisonTest(
-            datafiles=datafiles, comp_dir=comparison_dir,
-            parameters_to_fit=parameters_to_fit)
+            datafiles=datafiles,
+            comp_dir=comparison_dir,
+            parameters_to_fit=parameters_to_fit,
+        )
         test.run()
 
 
 def test_pspl_par():
-    datafiles = ['PSPL_par_Obs_1.pho', 'PSPL_par_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E', 'pi_E_N', 'pi_E_E']
+    datafiles = ["PSPL_par_Obs_1.pho", "PSPL_par_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E", "pi_E_N", "pi_E_E"]
     coords = "18:00:00 -30:00:00"
     for fac in [0.01]:
-        comparison_dir = 'PSPL_par_{0}'.format(fac)
+        comparison_dir = "PSPL_par_{0}".format(fac)
         print(comparison_dir)
         test = ComparisonTest(
-            datafiles=datafiles, comp_dir=comparison_dir,
-            parameters_to_fit=parameters_to_fit, coords=coords,
-            verbose=False)
+            datafiles=datafiles,
+            comp_dir=comparison_dir,
+            parameters_to_fit=parameters_to_fit,
+            coords=coords,
+            verbose=False,
+        )
         test.test_final_results()
 
 
 def test_pspl_fbzero():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     fac = 0.01
-    comparison_dir = 'PSPL_1_{0}_fbzero'.format(fac)
+    comparison_dir = "PSPL_1_{0}_fbzero".format(fac)
     print(comparison_dir)
     test = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_blend_flux=[0., False],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_blend_flux=[0.0, False],
+        verbose=False,
+    )
     test.run()
 
 
 def test_pspl_fs_fixed():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     fac = 0.01
-    comparison_dir = 'PSPL_1_{0}_fs_fixed'.format(fac)
+    comparison_dir = "PSPL_1_{0}_fs_fixed".format(fac)
     print(comparison_dir)
     test = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_source_flux=[False, 2.1],
-        verbose=False
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_source_flux=[False, 2.1],
+        verbose=False,
     )
     test.run()
 
 
 def test_pspl_Obs1_fixed():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     fac = 0.01
-    comparison_dir = 'PSPL_1_{0}_Obs1FixedFluxes'.format(fac)
+    comparison_dir = "PSPL_1_{0}_Obs1FixedFluxes".format(fac)
     print(comparison_dir)
     test = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_source_flux=[1.3, False],
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_source_flux=[1.3, False],
         fix_blend_flux=[0.0, False],
-        verbose=False)
+        verbose=False,
+    )
     test.run()
 
 
 def test_flux_indexing():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     fac = 0.01
-    comparison_dir = 'PSPL_1_{0}_fbzero'.format(fac)
+    comparison_dir = "PSPL_1_{0}_fbzero".format(fac)
     print(comparison_dir)
 
     test_1 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_blend_flux=[0., False],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_blend_flux=[0.0, False],
+        verbose=False,
+    )
 
     assert test_1.my_func.fs_indices == [3, 4]
     assert test_1.my_func.fb_indices == [None, 5]
 
     test_2 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_blend_flux=[False, 0.],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_blend_flux=[False, 0.0],
+        verbose=False,
+    )
 
     assert test_2.my_func.fs_indices == [3, 5]
     assert test_2.my_func.fb_indices == [4, None]
 
     test_3 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_blend_flux=[0., 0.],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_blend_flux=[0.0, 0.0],
+        verbose=False,
+    )
 
     assert test_3.my_func.fs_indices == [3, 4]
     assert test_3.my_func.fb_indices == [None, None]
 
     test_4 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_blend_flux=[False, False],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_blend_flux=[False, False],
+        verbose=False,
+    )
 
     assert test_4.my_func.fs_indices == [3, 5]
     assert test_4.my_func.fb_indices == [4, 6]
 
     test_5 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_source_flux=[False, 2.1],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_source_flux=[False, 2.1],
+        verbose=False,
+    )
 
     assert test_5.my_func.fs_indices == [3, None]
     assert test_5.my_func.fb_indices == [4, 5]
 
     test_6 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, fix_source_flux=[0.0, False],
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        fix_source_flux=[0.0, False],
+        verbose=False,
+    )
 
     print(test_6.my_func.fs_indices)
     print(test_6.my_func.fb_indices)
@@ -573,17 +659,20 @@ def test_flux_indexing():
 
 
 def test_flux_indexing_2():
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho', 'PSPL_2_Obs_1.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho", "PSPL_2_Obs_1.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     fac = 0.01
-    comparison_dir = 'PSPL_1_{0}_fbzero'.format(fac)
+    comparison_dir = "PSPL_1_{0}_fbzero".format(fac)
     print(comparison_dir)
 
     test_7 = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
         parameters_to_fit=parameters_to_fit,
         fix_source_flux=[False, 1.0, False],
-        fix_blend_flux=[False, 0.0, False], verbose=False)
+        fix_blend_flux=[False, 0.0, False],
+        verbose=False,
+    )
     print(test_7.my_func.fs_indices)
     print(test_7.my_func.fb_indices)
     assert test_7.my_func.fs_indices == [3, None, 5]
@@ -591,19 +680,22 @@ def test_flux_indexing_2():
 
 
 def test_fspl_1():
-    """ Test that the FSPL gradient calculation is very accurate."""
-    if int(mm.__version__.split('.')[0]) < 3:
-        print('Finite Source gradient will be implemented in MulensModel v3.')
+    """Test that the FSPL gradient calculation is very accurate."""
+    if int(mm.__version__.split(".")[0]) < 3:
+        print("Finite Source gradient will be implemented in MulensModel v3.")
 
-    datafiles = ['FSPL_Obs_1_I.pho', 'FSPL_Obs_2_V.pho']
-    parameters_to_fit = ['t_0', 'u_0', 't_E', 'rho']
+    datafiles = ["FSPL_Obs_1_I.pho", "FSPL_Obs_2_V.pho"]
+    parameters_to_fit = ["t_0", "u_0", "t_E", "rho"]
     fac = 0.01
-    comparison_dir = 'FSPL_1_{0}'.format(fac)
+    comparison_dir = "FSPL_1_{0}".format(fac)
     print(comparison_dir)
     test = ComparisonTest(
-        datafiles=datafiles, comp_dir=comparison_dir,
-        parameters_to_fit=parameters_to_fit, n_t_star=100,
-        verbose=False)
+        datafiles=datafiles,
+        comp_dir=comparison_dir,
+        parameters_to_fit=parameters_to_fit,
+        n_t_star=100,
+        verbose=False,
+    )
     test.test_3_iterations()
     test.test_final_results()
 
@@ -611,26 +703,27 @@ def test_fspl_1():
 def test_fixed_fluxes():
     """Check that the calc_df works for a variety of cases."""
     # datasets
-    datafiles = ['PSPL_1_Obs_1.pho', 'PSPL_1_Obs_2.pho', 'PSPL_2_Obs_1.pho']
+    datafiles = ["PSPL_1_Obs_1.pho", "PSPL_1_Obs_2.pho", "PSPL_2_Obs_1.pho"]
     datasets = []
     n_data = []
     for i, filename in enumerate(datafiles):
         data = mm.MulensData(
-            file_name=os.path.join(data_path, filename), phot_fmt='mag')
+            file_name=os.path.join(data_path, filename), phot_fmt="mag"
+        )
         n_data.append(len(data.time))
         datasets.append(data)
 
-    print('MM.version', mm.__version__)
-    print('datasets', datasets)
-    print('n_data', n_data)
+    print("MM.version", mm.__version__)
+    print("datasets", datasets)
+    print("n_data", n_data)
 
     # model parameters
-    model_params = {'t_0': 8645.00000, 'u_0': 0.250000, 't_E': 25.2000}
+    model_params = {"t_0": 8645.00000, "u_0": 0.250000, "t_E": 25.2000}
 
     def run_test(ulens=None, fix_source_flux=None, fix_blend_flux=None):
         # Create PSPL Function object
         if ulens:
-            parameters_to_fit = ['t_0', 'u_0', 't_E']
+            parameters_to_fit = ["t_0", "u_0", "t_E"]
             n_ulens = 3
             initial_guess = [model_params[key] for key in parameters_to_fit]
         else:
@@ -658,18 +751,21 @@ def test_fixed_fluxes():
         else:
             fix_blend_flux_dict = None
 
-        print('initial guess', initial_guess)
+        print("initial guess", initial_guess)
         event = mm.Event(
-            model=mm.Model(model_params), datasets=datasets,
+            model=mm.Model(model_params),
+            datasets=datasets,
             fix_source_flux=fix_source_flux_dict,
-            fix_blend_flux=fix_blend_flux_dict)
-        print('fix_source_flux', event.fix_source_flux)
-        print('fix_blend_flux', event.fix_blend_flux)
+            fix_blend_flux=fix_blend_flux_dict,
+        )
+        print("fix_source_flux", event.fix_source_flux)
+        print("fix_blend_flux", event.fix_blend_flux)
 
         my_func = sfit_minimizer.mm_funcs.PointLensSFitFunction(
-            event, parameters_to_fit)
-        print('fs_indices', my_func.fs_indices)
-        print('fb_indices', my_func.fb_indices)
+            event, parameters_to_fit
+        )
+        print("fs_indices", my_func.fs_indices)
+        print("fb_indices", my_func.fb_indices)
         my_func._update_ulens_params(initial_guess)
 
         # Run calc_df
@@ -688,25 +784,31 @@ def test_fixed_fluxes():
             if i == (len(datasets) - 1):
                 ind_i_1 = np.sum(n_data).astype(int)
             else:
-                ind_i_1 = np.sum(n_data[0:i + 1]).astype(int)
+                ind_i_1 = np.sum(n_data[0 : i + 1]).astype(int)
 
             for j in range(len(datasets)):
-                print('i,j', i, j)
+                print("i,j", i, j)
                 if j != i:
                     # zeros for dataset i for flux parameters of dataset j
                     if fix_source_flux != j:
                         assert (
                             np.sum(
                                 my_func.df[
-                                    my_func.fs_indices[j], ind_i_0:ind_i_1]
-                            ) == 0)
+                                    my_func.fs_indices[j], ind_i_0:ind_i_1
+                                ]
+                            )
+                            == 0
+                        )
 
                     if fix_blend_flux != j:
                         assert (
                             np.sum(
                                 my_func.df[
-                                    my_func.fb_indices[j], ind_i_0:ind_i_1]
-                            ) == 0)
+                                    my_func.fb_indices[j], ind_i_0:ind_i_1
+                                ]
+                            )
+                            == 0
+                        )
 
                 else:
                     # zeros for dataset i for flux parameters of dataset j
@@ -714,66 +816,72 @@ def test_fixed_fluxes():
                         assert (
                             np.sum(
                                 my_func.df[
-                                    my_func.fs_indices[j], ind_i_0:ind_i_1]
-                            ) != 0)
+                                    my_func.fs_indices[j], ind_i_0:ind_i_1
+                                ]
+                            )
+                            != 0
+                        )
 
                     if fix_blend_flux != j:
                         assert (
                             np.sum(
                                 my_func.df[
-                                    my_func.fb_indices[j], ind_i_0:ind_i_1]
-                            ) != 0)
+                                    my_func.fb_indices[j], ind_i_0:ind_i_1
+                                ]
+                            )
+                            != 0
+                        )
 
     # ulens parameters + 3 datasets
-    print('t1')
+    print("t1")
     run_test(ulens=True)
 
     # ulens parameters + fix source flux for dataset 1
-    print('t2')
+    print("t2")
     run_test(ulens=True, fix_source_flux=0)
 
     # ulens parameters + fix blend flux for dataset_1
-    print('t3')
+    print("t3")
     run_test(ulens=True, fix_blend_flux=0)
 
     # ulens parameters + fix both source and blend flux for dataset_1
-    print('t4')
+    print("t4")
     run_test(ulens=True, fix_source_flux=0, fix_blend_flux=0)
 
     # ulens parameters + fix both source and blend flux for dataset_2
-    print('t5')
+    print("t5")
     run_test(ulens=True, fix_source_flux=1, fix_blend_flux=1)
 
     # ulens parameters + fix both source and blend flux for dataset_3
-    print('t6')
+    print("t6")
     run_test(ulens=True, fix_source_flux=2, fix_blend_flux=2)
 
     # just fluxes
-    print('t7')
+    print("t7")
     run_test(ulens=False)
 
     # just fluxes but fix source flux for dataset_1
-    print('t8')
+    print("t8")
     run_test(ulens=False, fix_source_flux=0)
 
     # just fluxes but fix blend flux for dataset_1
-    print('t9')
+    print("t9")
     run_test(ulens=False, fix_blend_flux=0)
 
     # just fluxes but fix both source and blend flux for dataset_1
-    print('t10')
+    print("t10")
     run_test(ulens=False, fix_source_flux=0, fix_blend_flux=0)
 
     # just fluxes but fix both source and blend flux for dataset_3
-    print('t11')
+    print("t11")
     run_test(ulens=False, fix_source_flux=1, fix_blend_flux=1)
 
     # just fluxes but fix both source and blend flux for dataset_3
-    print('t12')
+    print("t12")
     run_test(ulens=False, fix_source_flux=2, fix_blend_flux=2)
 
     # just fluxes but fix source and blend flux for different datasets
-    print('t13')
+    print("t13")
     run_test(ulens=False, fix_source_flux=2, fix_blend_flux=0)
 
 
@@ -782,18 +890,19 @@ def test_fit_mulens_event():
     Test that fitting perfect data results in a valid answer.
     """
     # Truth
-    expected = {'t_0': 8645.00000, 'u_0': 0.250000, 't_E': 25.2000}
+    expected = {"t_0": 8645.00000, "u_0": 0.250000, "t_E": 25.2000}
 
     # Read in the data:
     datasets = get_pspl_datafiles()
 
     # Create the model and event objects
-    model = mm.Model({'t_0': 8650., 'u_0': 0.30000, 't_E': 25.00000})
+    model = mm.Model({"t_0": 8650.0, "u_0": 0.30000, "t_E": 25.00000})
     event = mm.Event(datasets=datasets, model=model)
 
-    parameters_to_fit = ['t_0', 'u_0', 't_E']
+    parameters_to_fit = ["t_0", "u_0", "t_E"]
     results = sfit_minimizer.fit_mulens_event(
-        event=event, parameters_to_fit=parameters_to_fit, verbose=False)
+        event=event, parameters_to_fit=parameters_to_fit, verbose=False
+    )
 
     for i, parameter in enumerate(parameters_to_fit):
         frac_diff = (results.x[i] - expected[parameter]) / results.sigmas[i]
@@ -801,13 +910,12 @@ def test_fit_mulens_event():
 
 
 class TestPointLensSFitFuncion(unittest.TestCase):
-
     def setUp(self):
         # Read in the data:
         self.datasets = get_pspl_datafiles()
-        
+
         # Create the model and event objects
-        self.model = mm.Model({'t_0': 8650., 'u_0': 0.30000, 't_E': 25.00000})
+        self.model = mm.Model({"t_0": 8650.0, "u_0": 0.30000, "t_E": 25.00000})
         self.event = mm.Event(datasets=self.datasets, model=self.model)
 
     def test_estimate_fluxes(self):
@@ -817,33 +925,40 @@ class TestPointLensSFitFuncion(unittest.TestCase):
 
         # Test estimate_fluxes
         my_func = sfit_minimizer.mm_funcs.PointLensSFitFunction(
-            event, parameters_to_fit=['t_0'], estimate_fluxes=True)
+            event, parameters_to_fit=["t_0"], estimate_fluxes=True
+        )
         np.testing.assert_almost_equal(
-            my_func.event.fix_source_flux[self.datasets[0]], fluxes[0][0])
+            my_func.event.fix_source_flux[self.datasets[0]], fluxes[0][0]
+        )
         np.testing.assert_almost_equal(
-            my_func.event.fix_blend_flux[self.datasets[0]], fluxes[1])
+            my_func.event.fix_blend_flux[self.datasets[0]], fluxes[1]
+        )
 
     def test_add2450000(self):
         datasets = []
         for file_ in [SAMPLE_FILE_01, SAMPLE_FILE_02]:
-            datasets.append(mm.MulensData(
-                file_name=file_, phot_fmt='mag', add_2450000=True))
+            datasets.append(
+                mm.MulensData(
+                    file_name=file_, phot_fmt="mag", add_2450000=True
+                )
+            )
 
         model = copy.copy(self.model)
-        model.parameters.parameters['t_0'] += 2450000.
+        model.parameters.parameters["t_0"] += 2450000.0
         event = mm.Event(datasets=datasets, model=model)
 
         my_func = sfit_minimizer.mm_funcs.PointLensSFitFunction(
-            event, parameters_to_fit=['t_0'], add_2450000=True)
+            event, parameters_to_fit=["t_0"], add_2450000=True
+        )
         assert my_func.add_2450000
 
-        my_func.update_all(theta=[9000., 1.1, 0.1, 1.1, 0.1])
+        my_func.update_all(theta=[9000.0, 1.1, 0.1, 1.1, 0.1])
         np.testing.assert_almost_equal(
-            my_func.event.model.parameters.t_0, 2459000.)
+            my_func.event.model.parameters.t_0, 2459000.0
+        )
 
 
 class TestInitialGuess(unittest.TestCase):
-
     def test_1L1S(self):
         pass
 

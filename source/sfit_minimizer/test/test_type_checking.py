@@ -1,6 +1,7 @@
 """
 Check that the type-checking works as expected.
 """
+
 import unittest
 
 import numpy as np
@@ -9,7 +10,6 @@ from sfit_minimizer.sfit_classes import SFitFunction
 
 
 class TestType4SFit(unittest.TestCase):
-
     def setUp(self):
         self.n = 100
         self.dates = range(0, self.n)
@@ -20,7 +20,6 @@ class TestType4SFit(unittest.TestCase):
 
 # data: np.array, dimensions
 class TestDataType(TestType4SFit):
-
     def test_data_type_1(self):
         # wrong type
         with self.assertRaises(TypeError):
@@ -38,7 +37,6 @@ class TestDataType(TestType4SFit):
 
 # theta: type, dimensions
 class TestThetaType(TestType4SFit):
-
     def setUp(self):
         TestType4SFit.setUp(self)
         self.func = SFitFunction(data=self.data)
@@ -63,7 +61,6 @@ class TestThetaType(TestType4SFit):
 
 # ymod: type, dimensions
 class TestYModType(TestType4SFit):
-
     def setUp(self):
         TestType4SFit.setUp(self)
         self.func = SFitFunction(data=self.data)
@@ -80,12 +77,11 @@ class TestYModType(TestType4SFit):
     def test_ymod_3(self):
         # wrong size
         with self.assertRaises(ValueError):
-            self.func.ymod = np.arange(0, self.n+1)
+            self.func.ymod = np.arange(0, self.n + 1)
 
 
 # res: type, dimensions
 class TestResType(TestType4SFit):
-
     def setUp(self):
         TestType4SFit.setUp(self)
         self.func = SFitFunction(data=self.data)
@@ -102,12 +98,11 @@ class TestResType(TestType4SFit):
     def test_res_3(self):
         # wrong size
         with self.assertRaises(ValueError):
-            self.func.residuals = np.arange(0, self.n+1)
+            self.func.residuals = np.arange(0, self.n + 1)
 
 
 # df: type, dimensions
 class TestDFType(TestType4SFit):
-
     def setUp(self):
         TestType4SFit.setUp(self)
         self.func = SFitFunction(data=self.data, theta=[0, 1])
@@ -124,9 +119,9 @@ class TestDFType(TestType4SFit):
     def test_df_3(self):
         # wrong size
         with self.assertRaises(ValueError):
-            self.func.df = np.zeros((2, self.n+1))
+            self.func.df = np.zeros((2, self.n + 1))
 
     def test_df_4(self):
         # wrong size
         with self.assertRaises(ValueError):
-            self.func.df = np.zeros((3, self.n+1))
+            self.func.df = np.zeros((3, self.n + 1))

@@ -2,6 +2,7 @@
 Assuming a linear function of the form "f = a0 + a1 * x + a2 * x^2 ...", check
 that the minimizer works as expected.
 """
+
 import os.path
 import unittest
 
@@ -11,7 +12,6 @@ import sfit_minimizer
 
 
 class LinearFunction(sfit_minimizer.SFitFunction):
-
     def __init__(self, data=None, theta=None):
         sfit_minimizer.SFitFunction.__init__(self, data=data, theta=theta)
 
@@ -36,15 +36,20 @@ class LinearFunction(sfit_minimizer.SFitFunction):
 
 def test_perfect_chi2():
     """chi2 should be 0"""
-    data = np.loadtxt(os.path.join(
-        sfit_minimizer.DATA_PATH, 'PolynomialTest', 'test_data_10perfect.txt'),
-        skiprows=2)
+    data = np.loadtxt(
+        os.path.join(
+            sfit_minimizer.DATA_PATH,
+            "PolynomialTest",
+            "test_data_10perfect.txt",
+        ),
+        skiprows=2,
+    )
     theta = [3, 2]
     my_func = LinearFunction(data=data, theta=theta)
     my_func.calc_chi2()
 
     tol = 1e-6
-    np.testing.assert_almost_equal(my_func.residuals, 0., decimal=3)
+    np.testing.assert_almost_equal(my_func.residuals, 0.0, decimal=3)
     assert my_func.chi2 < tol
 
 
@@ -55,7 +60,14 @@ def test_fit():
     :return:
     """
     # Fake data
-    data = np.loadtxt(os.path.join(sfit_minimizer.DATA_PATH, 'PolynomialTest', 'test_data_10000pts_Poisson.txt'), skiprows=2)
+    data = np.loadtxt(
+        os.path.join(
+            sfit_minimizer.DATA_PATH,
+            "PolynomialTest",
+            "test_data_10000pts_Poisson.txt",
+        ),
+        skiprows=2,
+    )
 
     # Wrong initial condition
     theta = [4, 2.1]
@@ -63,8 +75,8 @@ def test_fit():
     # Compare results
     my_func = LinearFunction(data=data, theta=theta)
     my_func.update_all()
-    print('step', my_func.step)
-    print('df.shape', my_func.df.shape)
+    print("step", my_func.step)
+    print("df.shape", my_func.df.shape)
 
     # Check ymod, res
     y = data[:, 0] * theta[1] + theta[0]
@@ -74,7 +86,7 @@ def test_fit():
 
     # Check b, c, d matrices
     b = np.zeros((2, 2))
-    b[0, 0] = np.sum(1. / data[:, 2] ** 2)
+    b[0, 0] = np.sum(1.0 / data[:, 2] ** 2)
     b[0, 1] = np.sum(data[:, 0] / data[:, 2] ** 2)
     b[1, 0] = b[0, 1]
     b[1, 1] = np.sum(data[:, 0] ** 2 / data[:, 2] ** 2)
@@ -91,66 +103,102 @@ def test_fit():
     theta_new = theta + my_func.step
     sigmas = my_func.get_sigmas()
     try:
-        assert np.abs(theta_new[0] - 3.) < 3. * sigmas[0]
-        assert np.abs(theta_new[1] - 2.) < 3. * sigmas[1]
+        assert np.abs(theta_new[0] - 3.0) < 3.0 * sigmas[0]
+        assert np.abs(theta_new[1] - 2.0) < 3.0 * sigmas[1]
     except AssertionError:
         return my_func, theta_new
 
 
 # Test that the minimize function produces the expected results
 class TestMinimize(unittest.TestCase):
-
     def setUp(self):
-        self.data = np.loadtxt(os.path.join(sfit_minimizer.DATA_PATH, 'PolynomialTest', 'test_data_10000pts_Poisson.txt'),
-                          skiprows=2)
+        self.data = np.loadtxt(
+            os.path.join(
+                sfit_minimizer.DATA_PATH,
+                "PolynomialTest",
+                "test_data_10000pts_Poisson.txt",
+            ),
+            skiprows=2,
+        )
         self.initial_guess = [4, 2.1]  # Wrong initial condition
         self.my_func = LinearFunction(data=self.data)
 
     def _evaluate_test(self, result):
         self.my_func.theta = result.x
-        np.testing.assert_almost_equal(self.my_func.get_chi2(), 10865.52999, decimal=3)
+        np.testing.assert_almost_equal(
+            self.my_func.get_chi2(), 10865.52999, decimal=3
+        )
         print(result)
 
     def test_minimize(self):
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-7,
-            options={'step': 'adaptive'}, verbose=False)
+            self.my_func,
+            x0=self.initial_guess,
+            tol=1e-7,
+            options={"step": "adaptive"},
+            verbose=False,
+        )
         self._evaluate_test(result)
 
     def test_minimize_no_options(self):
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-7,
-            verbose=False)
+            self.my_func, x0=self.initial_guess, tol=1e-7, verbose=False
+        )
 
         self._evaluate_test(result)
 
     def test_minimize_fixed_step(self):
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-7,
-            options={'step': 0.01}, max_iter=10000, verbose=False)
+            self.my_func,
+            x0=self.initial_guess,
+            tol=1e-7,
+            options={"step": 0.01},
+            max_iter=10000,
+            verbose=False,
+        )
         self._evaluate_test(result)
 
     def test_minimize_excceeds_max_iter(self):
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-7,
-            options={'step': 0.01}, max_iter=100, verbose=False)
+            self.my_func,
+            x0=self.initial_guess,
+            tol=1e-7,
+            options={"step": 0.01},
+            max_iter=100,
+            verbose=False,
+        )
         assert result.success == False
-        assert result.msg[0:3] == 'max'
+        assert result.msg[0:3] == "max"
 
     def test_minimize_none_step(self):
         result = sfit_minimizer.minimize(
-            self.my_func, x0=self.initial_guess, tol=1e-7,
-            options={'step': None}, max_iter=10000, verbose=False)
+            self.my_func,
+            x0=self.initial_guess,
+            tol=1e-7,
+            options={"step": None},
+            max_iter=10000,
+            verbose=False,
+        )
         self._evaluate_test(result)
 
     def test_minimize_value_error_1(self):
         with self.assertRaises(ValueError):
             result = sfit_minimizer.minimize(
-                self.my_func, x0=self.initial_guess, tol=1e-7,
-                options={'step': 'banana'}, max_iter=10000, verbose=False)
+                self.my_func,
+                x0=self.initial_guess,
+                tol=1e-7,
+                options={"step": "banana"},
+                max_iter=10000,
+                verbose=False,
+            )
 
     def test_minimize_value_error_2(self):
         with self.assertRaises(ValueError):
             result = sfit_minimizer.minimize(
-                self.my_func, x0=self.initial_guess, tol=1e-7,
-                options={'step': np.nan}, max_iter=10000, verbose=False)
+                self.my_func,
+                x0=self.initial_guess,
+                tol=1e-7,
+                options={"step": np.nan},
+                max_iter=10000,
+                verbose=False,
+            )
