@@ -8,6 +8,12 @@ except ImportError:
     # with no install). Do not hardcode a real-looking number here: it would go
     # stale silently and misreport the version.
     __version__ = "0.0.0.dev0"
+# ORDER IS LOAD-BEARING, DO NOT SORT. mm_funcs declares
+# `class PointLensSFitFunction(sfit_minimizer.SFitFunction)`, which resolves at
+# class-definition time, so sfit_classes must have populated this namespace
+# first. Alphabetical order puts mm_funcs first and raises
+# "partially initialized module ... has no attribute 'SFitFunction'".
+# Enforced by per-file-ignores for I001 in pyproject.toml.
 from sfit_minimizer.sfit_minimize import *
 from sfit_minimizer.sfit_classes import *
 from sfit_minimizer.mm_funcs import *

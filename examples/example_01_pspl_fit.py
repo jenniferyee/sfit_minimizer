@@ -1,12 +1,12 @@
 """
 Example of fitting a point lens to some data using MulensModel.
 """
-import sfit_minimizer
-
-import MulensModel as mm
 import os.path
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import MulensModel as mm
+
+import sfit_minimizer
 
 # Read in the data:
 data_path = os.path.join(sfit_minimizer.DATA_PATH, 'MMTest')

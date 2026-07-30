@@ -33,6 +33,38 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 version_file = "source/sfit_minimizer/version.py"
 
+[tool.ruff]
+# Identical to MMEXOFAST and EXOZIPPy so contributors moving between the three
+# repositories get the same behaviour rather than three line lengths to
+# remember. 79 matches the style this codebase was already written in.
+line-length = 79
+
+# ruff also formats Markdown code blocks and notebooks; neither is wanted here.
+# build/ and the generated version.py are skipped automatically via .gitignore.
+extend-exclude = ["*.md", "*.ipynb"]
+
+[tool.ruff.lint]
+# Deliberately narrow: error-class rules only, all of which pass as of this
+# commit, so the hook goes in without a mass edit and without a single `# noqa`.
+# Its job is to stop regressions, not to relitigate style. Same list as the
+# sibling repos -- see MMEXOFAST's pyproject.toml for what each rule caught
+# there and the measured counts for the rules left out (E501, F401).
+select = [
+    "E9", "F821", "F632", "F502", "F522", "F701", "F702", "B002", "PLE", "I",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sfit_minimizer"]
+
+[tool.ruff.lint.per-file-ignores]
+# The star-import order in __init__.py is load-bearing: mm_funcs subclasses
+# sfit_minimizer.SFitFunction at class-definition time, so sfit_classes has to
+# populate the namespace first. Sorting them alphabetically -- which is exactly
+# what `ruff check --fix` does, and what the pre-commit hook's `--fixable I`
+# would do unprompted -- makes `import sfit_minimizer` raise AttributeError.
+# Verified: it broke, which is why this entry exists.
+"source/sfit_minimizer/__init__.py" = ["I001"]
+
 [tool.setuptools]
 package-dir = { "" = "source" }
 

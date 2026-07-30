@@ -1,13 +1,14 @@
 """
 Tests for the MulensModel functions = direct comparisons to Andy's fortran sfit.
 """
-import unittest
 import copy
-import numpy as np
 import os.path
+import unittest
+
+import MulensModel as mm
+import numpy as np
 
 import sfit_minimizer
-import MulensModel as mm
 
 """
 # Tests I need:

@@ -1,8 +1,10 @@
 """
 Check that the type-checking works as expected.
 """
-import numpy as np
 import unittest
+
+import numpy as np
+
 from sfit_minimizer.sfit_classes import SFitFunction
 
 

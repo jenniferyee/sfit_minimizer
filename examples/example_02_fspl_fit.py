@@ -2,12 +2,12 @@
 Example of fitting a point lens to some data using MulensModel. Includes finite
 source effects.
 """
-import sfit_minimizer
-
-import MulensModel as mm
 import os.path
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import MulensModel as mm
+
+import sfit_minimizer
 
 if int(mm.__version__.split('.')[0]) < 3:
     print('Finite Source gradient will be implemented in MulensModel v3.')

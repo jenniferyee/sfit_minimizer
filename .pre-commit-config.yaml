@@ -1,0 +1,24 @@
+# Install with:  pre-commit install
+#
+# The rev is pinned exactly and must match the version in
+# .github/workflows/lint.yml, or CI and the hook disagree about what is clean.
+# Dependabot tracks this file, so bumps arrive as reviewable PRs.
+#
+# `args: [--fix, --fixable, I]` limits autofixing to import sorting, matching
+# MMEXOFAST. NEVER broaden it -- F401 is the obvious next reach and ruff treats
+# it as auto-fixable, which would delete the star re-exports in
+# sfit_minimizer/__init__.py that exist precisely to be re-exported.
+#
+# Even import sorting is not unconditionally safe here: sorting __init__.py's
+# star-imports breaks `import sfit_minimizer` outright, because mm_funcs
+# subclasses sfit_minimizer.SFitFunction at class-definition time. That file is
+# excluded via per-file-ignores in pyproject.toml, which this hook honours --
+# do not remove it.
+#
+# No ruff-format hook yet; see the note in .github/workflows/lint.yml.
+repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.0
+    hooks:
+    -   id: ruff-check
+        args: [--fix, --fixable, I]

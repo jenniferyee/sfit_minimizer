@@ -1,10 +1,12 @@
 """
 Example of fitting a polynomial of the form y = m * x + b to some data.
 """
-import sfit_minimizer
+import os.path
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os.path
+
+import sfit_minimizer
 
 
 # User defines a fitting function that inherits from SFitFunction

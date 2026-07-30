@@ -2,10 +2,11 @@
 Assuming a linear function of the form "f = a0 + a1 * x + a2 * x^2 ...", check
 that the minimizer works as expected.
 """
+import os.path
 import unittest
 
 import numpy as np
-import os.path
+
 import sfit_minimizer
 
 

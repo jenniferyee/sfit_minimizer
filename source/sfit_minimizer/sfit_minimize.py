@@ -1,6 +1,8 @@
-from sfit_minimizer.sfit_classes import SFitResults
 import time
+
 import numpy as np
+
+from sfit_minimizer.sfit_classes import SFitResults
 
 
 def set_initial_step_size(options):
