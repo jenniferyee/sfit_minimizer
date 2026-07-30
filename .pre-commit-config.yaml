@@ -15,10 +15,12 @@
 # excluded via per-file-ignores in pyproject.toml, which this hook honours --
 # do not remove it.
 #
-# No ruff-format hook yet; see the note in .github/workflows/lint.yml.
+# ruff-check runs BEFORE ruff-format: the linter's import sorting decides which
+# lines exist, the formatter decides how they wrap.
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.0
     hooks:
     -   id: ruff-check
         args: [--fix, --fixable, I]
+    -   id: ruff-format

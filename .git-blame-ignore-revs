@@ -1,0 +1,18 @@
+# Commits listed here are skipped by `git blame`, so a mechanical reformat
+# does not show up as the last author of every line in the repository.
+#
+# GitHub honours this file automatically in its blame view. Locally it needs
+# one opt-in, once per clone:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Only ever add commits that are PURELY mechanical -- no logic changes mixed
+# in. A commit listed here becomes invisible to blame, so anything real hidden
+# inside it is effectively lost to archaeology.
+
+# Apply ruff format across the tree (11 files), bringing this repo in line with
+# MMEXOFAST and EXOZIPPy. Verified formatting-only: every file parses to an
+# identical AST apart from docstring whitespace normalization, and the suite
+# stayed 43/43. The config and workflow changes that came with the switch are
+# separate commits, which is why this must not be squashed into them.
+4abab0f4107a123420006c42b5dd2dc805ba3b0c
