@@ -15,8 +15,14 @@ Docs: https://jenniferyee.github.io/sfit_minimizer/
 The package lives in `source/sfit_minimizer/` (`pyproject.toml` sets
 `package-dir = {"" = "source"}`), so imports only work after `pip install -e .`, under
 `uv run`, or with `PYTHONPATH=source`. The legacy `setup.py` is kept alongside
-`pyproject.toml`; the `[project]` table is the authoritative metadata, and the version is read
-dynamically from `source/sfit_minimizer/version.py`.
+`pyproject.toml`; the `[project]` table is the authoritative metadata.
+
+**The version is derived from git tags** by setuptools-scm — there is no version string to edit.
+`source/sfit_minimizer/version.py` is *generated* at build/install time and gitignored (it used to
+be a tracked file holding `__version__ = "1.0.2"`). A tag `v1.0.3` builds `1.0.3`; a commit after
+it builds `1.0.4.dev<N>+g<sha>`, and a dirty tree appends `.d<date>`. `__init__.py` imports
+`version.py` in a `try/except ImportError` that falls back to `0.0.0.dev0`, because a fresh clone
+has no generated file until something builds or installs the package.
 
 `MulensModel` is *not* a hard runtime dependency — the core minimizer needs only numpy and
 matplotlib. It is declared in the `mulens` and `test` extras, which is why the CI job installs
@@ -48,12 +54,15 @@ cd docs && sphinx-build -b html source .
 # (docs/Makefile's `make html` writes to docs/build instead, which is NOT what is published)
 ```
 
-Version lives in `source/sfit_minimizer/version.py`; past commits also bump the "Latest release"
-line in `README.md`. `docs/source/conf.py` has `release = '0'` and is not kept in sync.
+Two version strings are still maintained by hand and are *not* fed by the tags: the "Latest
+release" line in `README.md`, and `docs/source/conf.py`'s `release = '0'` (never kept in sync).
 
-`build/`, `source/sfit_minimizer.egg-info/`, `uv.lock`, and the `__pycache__`/`.pytest_cache`
-directories are covered by `.gitignore`. Three `.coverage` files are tracked in git from before
-that existed; `.gitignore` does not untrack them.
+Because `docs/source/sfit_minimizer.version.rst` autodocs the generated module, `sphinx-build` on
+a clean clone fails on that one page until the package has been built or installed once.
+
+`build/`, `dist/`, `source/sfit_minimizer.egg-info/`, the generated `version.py`, `uv.lock`, and
+the `__pycache__`/`.pytest_cache` directories are covered by `.gitignore`. Three `.coverage` files
+are tracked in git from before that existed; `.gitignore` does not untrack them.
 
 ## CI
 
@@ -65,6 +74,35 @@ suite is ~7 s, so every interpreter gets a full run).
 The job relies on `uv` installing the project **editable**, because `DATA_PATH` walks up from the
 module file to find `<repo>/data`. A non-editable install would resolve `DATA_PATH` into
 site-packages and every data-loading test would fail.
+
+`tests.yml` also exposes `workflow_call`, which `publish.yml` uses to gate releases on the same
+suite rather than a copy of it. Adding a job there that needs write permissions means granting it
+explicitly at the `uses:` call site in `publish.yml`, or the whole release workflow fails at
+startup before any job runs.
+
+## Releasing
+
+`.github/workflows/publish.yml` releases on a pushed `v*` tag: build → tests → PyPI → GitHub
+Release. `workflow_dispatch` builds and verifies without publishing, and can optionally push to
+TestPyPI as a rehearsal.
+
+```bash
+git tag -a v1.0.3 -m "v1.0.3"   # annotated: the message body becomes the release notes
+git push origin v1.0.3
+```
+
+Since the version comes from the tag, the tag *is* the version — the workflow refuses to publish
+if the built artifact's version doesn't match, because PyPI versions can never be reused. Tags
+containing `a`/`b`/`rc` are marked as GitHub pre-releases.
+
+Upload uses PyPI Trusted Publishing (OIDC); there is no API token anywhere. Two things about this
+repo's setup are unusual and deliberate, both explained at length in the workflow's header comment:
+
+- The PyPI project is owned by a **different account** than the GitHub repo. PyPI only checks the
+  owner/repo/workflow triple, so this works — but anyone who can push a `v*` tag here can publish.
+- **No GitHub environment is used** (unlike EXOZIPPy's otherwise-identical workflow), because
+  environments are owner-only on a personal-account repo and bare ones carry no protection. The
+  header documents the correct order for adding one later: workflow first, PyPI second.
 
 ## Architecture
 

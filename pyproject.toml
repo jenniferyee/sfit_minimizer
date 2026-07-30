@@ -18,12 +18,20 @@ mulens = ["MulensModel"]
 test = ["pytest", "MulensModel"]
 
 [build-system]
-# >=77 for PEP 639 SPDX `license` / `license-files` support.
-requires = ["setuptools>=77"]
+# setuptools >=77 for PEP 639 SPDX `license` / `license-files` support.
+requires = ["setuptools>=77", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.dynamic]
-version = { attr = "sfit_minimizer.version.__version__" }
+# The version comes from `git describe`, i.e. from the tags -- there is no
+# version string to edit by hand. Pushing tag v1.0.3 builds 1.0.3; a commit
+# after that tag builds 1.0.4.dev<N>+g<sha>. `version_file` is REGENERATED on
+# every build, so source/sfit_minimizer/version.py is a build artifact and is
+# gitignored rather than tracked.
+#
+# Consequence: a plain `git clone` has no version.py until something builds or
+# installs the package, which is why __init__.py imports it defensively.
+[tool.setuptools_scm]
+version_file = "source/sfit_minimizer/version.py"
 
 [tool.setuptools]
 package-dir = { "" = "source" }
