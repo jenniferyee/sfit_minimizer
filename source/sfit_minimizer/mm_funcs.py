@@ -144,13 +144,14 @@ class PointLensSFitFunction(sfit_minimizer.SFitFunction):
             Number of parameters to fit. Includes flux parameters.
 
     Notes:
-        1. if you want to fix the source or blend flux for a particular dataset,
-    use the *fix_source_flux* or *fix_blend_flux* keywords in *event* as usual.
+        1. If you want to fix the source or blend flux for a particular
+           dataset, use the *fix_source_flux* or *fix_blend_flux* keywords in
+           *event* as usual.
 
-        2. If u_0 is a parameter of the fit and it is too close to zero,
-    the matrix inversion will fail (produce
-    numpy.linalg.LinAlgError: Singular matrix). So if you see this error, check
-    the value of u_0. (Probably true of other parameters as well)
+        2. If u_0 is a parameter of the fit and it is too close to zero, the
+           matrix inversion will fail (produce numpy.linalg.LinAlgError:
+           Singular matrix). So if you see this error, check the value of u_0.
+           (Probably true of other parameters as well)
 
     """
 

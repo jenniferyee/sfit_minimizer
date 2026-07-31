@@ -1,19 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>sfit_minimizer package &#8212; SFit Minimizer 0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+    <title>sfit_minimizer package &#8212; SFit Minimizer 1.0.4.dev3+geb6a73502.d20260730 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5da30b24"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="sfit_minimizer.mm_funcs module" href="sfit_minimizer.mm_funcs.html" />
@@ -21,8 +19,9 @@
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -35,20 +34,81 @@
           <div class="body" role="main">
             
   <section id="sfit-minimizer-package">
-<h1>sfit_minimizer package<a class="headerlink" href="#sfit-minimizer-package" title="Permalink to this heading">¶</a></h1>
+<h1>sfit_minimizer package<a class="headerlink" href="#sfit-minimizer-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.mm_funcs.html">sfit_minimizer.mm_funcs module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.sfit_classes.html">sfit_minimizer.sfit_classes module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.sfit_minimize.html">sfit_minimizer.sfit_minimize module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.mm_funcs.html">sfit_minimizer.mm_funcs module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.fit_mulens_event"><code class="docutils literal notranslate"><span class="pre">fit_mulens_event()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.add_2450000"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.add_2450000</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.flatten_data"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.flatten_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.set_flux_indices"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.set_flux_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.update_all"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.calc_residuals"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.calc_residuals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.mm_funcs.html#sfit_minimizer.mm_funcs.PointLensSFitFunction.calc_df"><code class="docutils literal notranslate"><span class="pre">PointLensSFitFunction.calc_df()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.sfit_classes.html">sfit_minimizer.sfit_classes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults"><code class="docutils literal notranslate"><span class="pre">SFitResults</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.x"><code class="docutils literal notranslate"><span class="pre">SFitResults.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.fun"><code class="docutils literal notranslate"><span class="pre">SFitResults.fun</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.sigmas"><code class="docutils literal notranslate"><span class="pre">SFitResults.sigmas</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.success"><code class="docutils literal notranslate"><span class="pre">SFitResults.success</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.msg"><code class="docutils literal notranslate"><span class="pre">SFitResults.msg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitResults.nit"><code class="docutils literal notranslate"><span class="pre">SFitResults.nit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction"><code class="docutils literal notranslate"><span class="pre">SFitFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.reset_all"><code class="docutils literal notranslate"><span class="pre">SFitFunction.reset_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.theta"><code class="docutils literal notranslate"><span class="pre">SFitFunction.theta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.update_all"><code class="docutils literal notranslate"><span class="pre">SFitFunction.update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.ymod"><code class="docutils literal notranslate"><span class="pre">SFitFunction.ymod</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_model"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.residuals"><code class="docutils literal notranslate"><span class="pre">SFitFunction.residuals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_residuals"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_residuals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.chi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.chi2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_chi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_chi2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_chi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_chi2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.df"><code class="docutils literal notranslate"><span class="pre">SFitFunction.df</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_df"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.sigmas"><code class="docutils literal notranslate"><span class="pre">SFitFunction.sigmas</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_sigmas"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_sigmas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_sigmas"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_sigmas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.step"><code class="docutils literal notranslate"><span class="pre">SFitFunction.step</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_step"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_step"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.dchi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.dchi2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_dchi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_dchi2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_dchi2"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_dchi2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_partials"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_partials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.dvec"><code class="docutils literal notranslate"><span class="pre">SFitFunction.dvec</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_dvec"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_dvec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_dvec"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_dvec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.bmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.bmat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_bmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_bmat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_bmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_bmat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.cmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.cmat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.calc_cmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.calc_cmat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="sfit_minimizer.sfit_classes.html#sfit_minimizer.sfit_classes.SFitFunction.get_cmat"><code class="docutils literal notranslate"><span class="pre">SFitFunction.get_cmat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.sfit_minimize.html">sfit_minimizer.sfit_minimize module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.sfit_minimize.html#sfit_minimizer.sfit_minimize.set_initial_step_size"><code class="docutils literal notranslate"><span class="pre">set_initial_step_size()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sfit_minimizer.sfit_minimize.html#sfit_minimizer.sfit_minimize.minimize"><code class="docutils literal notranslate"><span class="pre">minimize()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="sfit_minimizer.version.html">sfit_minimizer.version module</a></li>
 </ul>
 </div>
 </section>
 <section id="module-sfit_minimizer">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sfit_minimizer" title="Permalink to this heading">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sfit_minimizer" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -57,7 +117,7 @@
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="index.html">SFit Minimizer</a></h1>
 
@@ -68,7 +128,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme_link.html">Readme File</a></li>
@@ -89,16 +158,6 @@
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -112,11 +171,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2021, Jennifer Yee.
+      &#169;2021, Jennifer Yee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/sfit_minimizer.rst.txt"

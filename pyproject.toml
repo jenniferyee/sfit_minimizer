@@ -16,6 +16,9 @@ dependencies = [
 # (sfit_minimizer.mm_funcs) operates on MulensModel Event objects.
 mulens = ["MulensModel"]
 test = ["pytest", "MulensModel"]
+# Sphinx autodoc imports the package, and conf.py reads the installed version,
+# so the docs build needs the project installed -- which `uv run` does.
+docs = ["sphinx"]
 
 [build-system]
 # setuptools >=77 for PEP 639 SPDX `license` / `license-files` support.

@@ -9,3 +9,8 @@ htmlcov/
 /.venv/
 uv.lock
 .pytest_cache/
+
+# Sphinx build cache; the published site does not need it and it churns
+# (including a binary pickle) on every rebuild.
+/docs/.doctrees/
+/docs/.buildinfo.bak

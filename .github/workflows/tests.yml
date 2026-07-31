@@ -10,7 +10,7 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -20,7 +20,16 @@ jobs:
         # combinations run concurrently, so breadth here is effectively free.
         # Keep this in sync with requires-python -- a version claimed there and
         # missing here is an untested claim.
+        os: [ubuntu-latest]
         python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          # macOS on one interpreter, matching EXOZIPPy. Actions minutes are
+          # free on public repositories, so the only cost is wall clock, and
+          # these jobs run concurrently. It is the platform most likely to
+          # differ for a matplotlib-importing package (backend selection) and
+          # nothing here is Linux-specific.
+          - os: macos-latest
+            python-version: "3.12"
 
     steps:
       - uses: actions/checkout@v7
