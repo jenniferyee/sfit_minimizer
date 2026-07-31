@@ -18,7 +18,13 @@ mulens = ["MulensModel"]
 test = ["pytest", "MulensModel"]
 # Sphinx autodoc imports the package, and conf.py reads the installed version,
 # so the docs build needs the project installed -- which `uv run` does.
-docs = ["sphinx"]
+#
+# The major is pinned because the docs job builds with -W: a new Sphinx adding
+# a deprecation warning would otherwise turn the job red for reasons unrelated
+# to any change here. Bumping this is a deliberate act, and the only cost of
+# being wrong is that the site stops updating -- the docs job is not in the
+# merge path.
+docs = ["sphinx>=9,<10"]
 
 [build-system]
 # setuptools >=77 for PEP 639 SPDX `license` / `license-files` support.

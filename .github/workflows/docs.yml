@@ -51,13 +51,31 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Flags, in order:
+      #   -n  nitpicky: report cross-references that do not resolve. These
+      #       docstrings lean on :py:func:/:py:attr:/:py:class: heavily, and
+      #       without this a reference to a renamed function silently renders
+      #       as plain text instead of a link.
+      #   -W  turn warnings into errors. The default warnings are the ones that
+      #       matter most: malformed RST in a docstring (which renders wrong on
+      #       the public site rather than failing), a page missing from every
+      #       toctree, and -- worst -- an autodoc import failure, which
+      #       otherwise "succeeds" while publishing an EMPTY page.
+      #   --keep-going  report every problem in one run instead of stopping at
+      #       the first, so fixing three warnings takes one run, not three.
+      #
+      # Both -n and -W passed with zero warnings when this was enabled, which
+      # is unusual for nitpicky mode; it works here because the docstrings
+      # write types as italics (*np.array*) rather than as reference roles.
+      #
       # -d keeps Sphinx's doctree cache out of the output directory; it is
       # build state, not part of the published site, and it used to be tracked
       # (a binary pickle that churned on every rebuild).
       - name: Build the site
         run: >
           uv run --extra docs
-          sphinx-build -b html -d "${RUNNER_TEMP}/doctrees" docs/source docs
+          sphinx-build -n -W --keep-going
+          -b html -d "${RUNNER_TEMP}/doctrees" docs/source docs
 
       - name: Commit the rebuilt site
         run: |
