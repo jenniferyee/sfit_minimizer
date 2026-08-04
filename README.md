@@ -23,7 +23,18 @@ Please see the "examples" folder.
 
 ## How to install?
 
-Clone this repository.
+```
+pip install sfit_minimizer
+```
+
+To include the microlensing layer (requires
+[MulensModel](https://github.com/rpoleski/MulensModel)):
+
+```
+pip install sfit_minimizer[mulens]
+```
+
+Or, for development, clone this repository and run `pip install -e .`
 
 ## License
 
